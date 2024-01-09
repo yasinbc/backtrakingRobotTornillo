@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Robot {
     private char[][] edificio;
@@ -64,8 +67,9 @@ public class Robot {
         System.out.println("[fichero salida] Nombre del fichero de salida");
     }
 
-    private void trazarAlgoritmo() {
+    private void trazarAlgoritmo(char[][] edificio) {
         char[][] copiaEdificio = new char[filas][columnas];
+        //copiaEdificio = edificio;
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 copiaEdificio[i][j] = edificio[i][j];
@@ -81,7 +85,7 @@ public class Robot {
         imprimirEdificio();
         System.out.println("Camino desde el tornillo hasta la salida:");
         for (int[] posicion : camino) {
-            System.out.println("(" + posicion[0] + ", " + posicion[1] + ")");
+            System.out.println("F(" + posicion[0] + ", " + posicion[1] + ")");
         }
     }
 
@@ -94,15 +98,16 @@ public class Robot {
         }
     }
 
-    public void generarEdificioAleatorio(int filas, int columnas) {
+    public static char[][] generarEdificioAleatorio(int filas, int columnas) {
         // Crear una instancia de Random para generar valores aleatorios
         Random random = new Random();
 
         // Definir los caracteres posibles en el edificio (L, E, T)
         char[] caracteresPosibles = {'L', 'E', 'T'};
+        char[][] edificio = new char[filas][columnas];
 
         // Inicializar el edificio con caracteres aleatorios
-        edificio = new char[filas][columnas];
+        //edificio = new char[filas][columnas];
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 int indiceCaracter = random.nextInt(caracteresPosibles.length);
@@ -115,14 +120,44 @@ public class Robot {
         int columnaTornillo = random.nextInt(columnas);
         edificio[filaTornillo][columnaTornillo] = 'T';
 
+        return edificio;
+        /*
         // Colocar el robot en la posición inicial (0, 0)
         posicionActual = new int[]{0, 0};
 
         // Limpiar la lista de camino
         camino.clear();
+        */
     }
 
+    private static char[][] leerEdificioDesdeArchivo(String fileName) {
+        // Patrón que verifica si el nombre del archivo tiene una extensión .txt
+        Pattern pattern = Pattern.compile("^.+\\.txt$");
+        Matcher matcher = pattern.matcher(fileName);
 
+        if (!matcher.matches()) {
+            System.err.println("El nombre del archivo debe tener la extensión .txt");
+            return null;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            // Leer filas y columnas
+            int filas = Integer.parseInt(br.readLine());
+            int columnas = Integer.parseInt(br.readLine());
+
+            // Leer edificio
+            char[][] edificio = new char[filas][columnas];
+            for (int i = 0; i < filas; i++) {
+                String line = br.readLine();
+                edificio[i] = line.replaceAll("\\s+", "").toCharArray();
+            }
+
+            return edificio;
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+            return null;
+        }
+    }
 
 
     /*
@@ -157,10 +192,52 @@ public class Robot {
 
 
     public static void main(String[] args) {
+        //int filas = 6;
+        //int columnas = 5;
+        //char[][] edificio = Robot.generarEdificioAleatorio(filas, columnas);
+
+
+
+        char[][] edificio = {
+                {'L', 'L', 'E', 'L', 'L'},
+                {'L', 'E', 'L', 'E', 'L'},
+                {'L', 'L', 'E', 'L', 'L'},
+                {'L', 'L', 'L', 'E', 'L'},
+                {'L', 'E', 'L', 'L', 'T'}
+        };
+
+        //Robot robot = new Robot(edificio);
+        //boolean trazar = false;
+
+        Robot robot = new Robot(edificio);
+        boolean trazar = false;
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-t")) {
+                trazar = true;
+            } else if (args[i].equals("-h")) {
+                ayuda();
+                return;  // Agrega un retorno para evitar ejecutar el resto del programa si se muestra la ayuda
+            }
+        }
+
+        imprimirPantalla(edificio, trazar);
+        robot.encontrarTornillo();
+
+        if (!robot.camino.isEmpty()) {
+            System.out.println("Camino desde el tornillo hasta la salida:");
+            for (int[] posicion : robot.camino) {
+                System.out.println("(" + posicion[0] + ", " + posicion[1] + ")");
+            }
+        } else {
+            System.out.println("El robot no ha encontrado el tornillo.");
+        }
+
 
         /*
         imprimirPantalla();
         */
+        /*
         // Iterar sobre los argumentos
         for (String arg : args) {
             // Comparar usando equals
@@ -173,11 +250,12 @@ public class Robot {
                 imprimirPantalla();
 
             } else {
+
                 // Otro procesamiento para argumentos no reconocidos
                 System.out.println("Argumento no reconocido: " + arg);
             }
         }
-
+        */
 
         /*
         // FUNCIONA SIN ARGUMENTOS
@@ -203,7 +281,7 @@ public class Robot {
         */
     }
 
-    public static void imprimirPantalla(){
+    public static void imprimirPantalla(char[][] edificio, boolean traza){
         /* //EDIFICIO ALEATORIO
         int filas = 5;  // Definir el número de filas del edificio
         int columnas = 5;  // Definir el número de columnas del edificio
@@ -214,7 +292,7 @@ public class Robot {
         // Trazar el algoritmo
         robot.trazarAlgoritmo();
         */
-
+        /*
         char[][] edificio = {
                 {'L', 'L', 'E', 'L', 'L'},
                 {'L', 'E', 'L', 'E', 'L'},
@@ -222,15 +300,20 @@ public class Robot {
                 {'L', 'L', 'L', 'E', 'L'},
                 {'L', 'E', 'L', 'L', 'T'}
         };
-
+        */
 
         //EDIFICIO ESTATICO
         Robot robot = new Robot(edificio);
         List<int[]> camino = robot.encontrarTornillo();
+        if(!traza){
+
+        }else{
+            robot.trazarAlgoritmo(edificio);
+        }
 
         // Trazar el algoritmo
         //Robot robot = new Robot(edificio);
-        robot.trazarAlgoritmo();
+        //robot.trazarAlgoritmo();
         /*
         if (!camino.isEmpty()) {
             System.out.println("Camino desde el tornillo hasta la salida:");
