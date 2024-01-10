@@ -1,10 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.*;
+import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,8 +53,6 @@ public class Robot {
     }
 
     private static void ayuda() {
-        System.out.println("|Orientaciones para el tutor");
-        System.out.println("UNIVERSIDAD NACIONAL DE EDUCACIÓN A DISTANCIA 3");
         System.out.println("SINTAXIS: java Robot [-t][-h] [fichero entrada] [fichero salida]");
         System.out.println("-t Traza el algoritmo");
         System.out.println("-h Muestra esta ayuda");
@@ -126,6 +119,7 @@ public class Robot {
         Pattern pattern = Pattern.compile("^.+\\.txt$");
         Matcher matcher = pattern.matcher(fileName);
 
+
         if (!matcher.matches()) {
             System.err.println("El nombre del archivo debe tener la extensión .txt");
             return null;
@@ -144,13 +138,144 @@ public class Robot {
             }
 
             return edificio;
+
         } catch (IOException e) {
             System.err.println("Error al leer el archivo: " + e.getMessage());
             return null;
         }
     }
 
+    public void escribirTrazaEnArchivo(String nombreArchivo) {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo))) {
+            // Se escribe la cantidad mínima en la primera línea.
+
+            bw.write(String.format(nombreArchivo));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
+            // Escribir información del edificio original
+            writer.write(nombreArchivo);
+            escribirEdificioEnArchivo(writer, edificio);
+
+            // Ejecutar el algoritmo para encontrar el tornillo y escribir la traza
+            encontrarTornilloDesdePosicion(posicionActual[0], posicionActual[1]);
+
+            // Escribir resultado del algoritmo
+            writer.write("\nResultado del algoritmo:\n");
+            escribirEdificioEnArchivo(writer, edificio);
+
+            // Escribir camino desde el tornillo hasta la salida
+            writer.write("Camino desde el tornillo hasta la salida:\n");
+            for (int[] posicion : camino) {
+                writer.write("F(" + posicion[0] + ", " + posicion[1] + ")\n");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+    }
+
+    private void escribirEdificioEnArchivo(BufferedWriter writer, char[][] edificio) throws IOException {
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                writer.write(edificio[i][j] + " ");
+            }
+            writer.write("\n");
+        }
+    }
+
+
     public static void main(String[] args) {
+        //Bloque para leer archivo de entrada
+        //-----------------------------------------------------------------------------------
+        char[][] edificio = {
+                {'L', 'L', 'E', 'L', 'L'},
+                {'L', 'E', 'L', 'E', 'L'},
+                {'L', 'L', 'E', 'L', 'L'},
+                {'L', 'L', 'L', 'E', 'L'},
+                {'L', 'E', 'L', 'L', 'T'}
+        };
+        boolean trazar = false;
+        Robot robot = new Robot(edificio);
+
+        Pattern pattern = Pattern.compile("^.+\\.txt$");
+        Matcher matcher = pattern.matcher(args[0]);
+
+        char[][] edificioTxt;
+        edificioTxt = leerEdificioDesdeArchivo(args[0]);
+
+        for(int i=0; i<args.length; i++){
+            if(args[i].equals("-h")){
+                ayuda();
+                return;
+            }else if(args[i].equals("-t")){
+                trazar = true;
+                imprimirPantalla(edificio, trazar);
+                //robot.encontrarTornillo();
+            }else if(matcher.find()){
+                trazar = false;
+                imprimirPantalla(edificioTxt, trazar);
+                //robot.encontrarTornillo();
+                if(args[i].equals("-t") && matcher.find()){
+                    trazar = true;
+                    imprimirPantalla(edificioTxt, trazar);
+                    //robot.encontrarTornillo();
+                }
+            }else if(matcher.find() && !args[1].isEmpty()){
+                char[][] edificioSalida;
+                trazar = false;
+                imprimirPantalla(edificioTxt, trazar);
+                robot.escribirTrazaEnArchivo(args[1]);
+                if(args[i].equals("-t") && matcher.find() && !args[1].isEmpty()){
+                    trazar = true;
+                    imprimirPantalla(edificioTxt, trazar);
+                    robot.escribirTrazaEnArchivo(args[1]);
+                }
+            }
+            trazar = false;
+        }
+
+        /*
+        char[][] edificioTxt;
+        edificioTxt = leerEdificioDesdeArchivo(args[0]);
+        Robot robot = new Robot(edificioTxt);
+
+        imprimirPantalla(edificioTxt, true);
+        robot.encontrarTornillo();
+        */
+
+
+
+        /*
+        // Verificar si se proporcionó al menos un argumento
+        if (args.length < 1) {
+            System.out.println("Debes proporcionar al menos un argumento.");
+            return;
+        }
+
+        // Expresión regular para verificar que el argumento no sea "-t" ni "-h"
+        String regex = "^(?!-t$|-h$).*$";
+
+        // Iterar sobre los argumentos
+        for (String arg : args) {
+            // Verificar si el argumento cumple con la expresión regular
+            if (Pattern.matches(regex, arg)) {
+                // El argumento es diferente de "-t" y "-h", puedes usarlo como argumento
+                edificioTxt = leerEdificioDesdeArchivo(arg);
+                // Hacer algo con el edificioTxt
+            } else {
+                // El argumento es "-t" o "-h"
+                System.out.println("Argumento no válido: " + arg);
+            }
+        }
+        //-----------------------------------------------------------------------------------
+
+
         char[][] edificio = {
                 {'L', 'L', 'E', 'L', 'L'},
                 {'L', 'E', 'L', 'E', 'L'},
@@ -173,6 +298,7 @@ public class Robot {
 
         imprimirPantalla(edificio, trazar);
         robot.encontrarTornillo();
+        */
     }
 
     public static void imprimirPantalla(char[][] edificio, boolean traza){
