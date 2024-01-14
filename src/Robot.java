@@ -92,7 +92,7 @@ public class Robot {
             System.out.println("No se encontró un camino hasta el tornillo.");
         } else {
             for (int[] posicion : getCamino()) {
-                System.out.println("F(" + posicion[0] + ", " + posicion[1] + ")");
+                System.out.println("( " + posicion[0] + ", " + posicion[1] + " )");
             }
         }
 
@@ -159,18 +159,6 @@ public class Robot {
         }
     }
 
-    public void escribirTrazaEnArchivo(String nombreArchivo) {
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo))) {
-            // Se escribe la cantidad mínima en la primera línea.
-
-            bw.write(String.format(nombreArchivo));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     // Método para almacenar el resultado en un archivo de salida
     public void guardarResultadoEnArchivo(Robot robot, String nombreArchivoSalida, char[][] edificio) {
         try {
@@ -191,7 +179,7 @@ public class Robot {
                     fw.write("No se encontró un camino hasta el tornillo.\n");
                 } else {
                     for (int[] x : robot.getCamino()) {
-                        String linea = String.format("(%d, %d)\n", x[0], x[1]);
+                        String linea = String.format("( %d, %d )\n", x[0], x[1]);
                         System.out.print(linea);
                         fw.write(linea);
                     }
@@ -227,14 +215,6 @@ public class Robot {
 
 
     public static void main(String[] args) {
-        //generarEdificioAleatorio(filas, columnas);
-        char[][] edificioInicial = {
-                {'L', 'L', 'E', 'L', 'L'},
-                {'L', 'E', 'L', 'E', 'L'},
-                {'L', 'L', 'E', 'L', 'L'},
-                {'L', 'L', 'L', 'E', 'L'},
-                {'L', 'E', 'L', 'L', 'T'}
-        };
 
         boolean trazar = false;
         String regexTxt = "^.+\\.txt$";
