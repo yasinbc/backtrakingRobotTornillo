@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 import java.io.File;
 import java.io.BufferedReader;
 
-public class Robot {
+
+
+public class RobotSolver {
     private static char[][] edificio;
     private int filas, columnas;
     private int[] posicionActual;
@@ -15,7 +17,7 @@ public class Robot {
         return camino;
     }
 
-    public Robot(char[][] edificio) {
+    public RobotSolver(char[][] edificio) {
         this.edificio = edificio;
         this.filas = edificio.length;
         this.columnas = edificio[0].length;
@@ -53,13 +55,12 @@ public class Robot {
             return true;
         }
 
-        // Si no se encuentra el tornillo desde la posicion actual, retroceder
         //camino.remove(camino.size() - 1);
         return false;
     }
 
     private static void ayuda() {
-        System.out.println("SINTAXIS: java Robot [-t][-h] [fichero entrada] [fichero salida]");
+        System.out.println("SINTAXIS: java RobotSolver [-t][-h] [fichero entrada] [fichero salida]");
         System.out.println("-t Traza el algoritmo");
         System.out.println("-h Muestra esta ayuda");
         System.out.println("[fichero entrada] Nombre del fichero de entrada");
@@ -68,7 +69,7 @@ public class Robot {
 
     private void trazarAlgoritmo(char[][] edificio) {
         char[][] copiaEdificio = new char[filas][columnas];
-        //copiaEdificio = edificio;
+
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 copiaEdificio[i][j] = edificio[i][j];
@@ -83,11 +84,6 @@ public class Robot {
         System.out.println("\nResultado del algoritmo:");
         imprimirEdificio();
         System.out.println("Camino desde el tornillo hasta la salida:");
-
-        /*for (int[] posicion : camino) {
-            System.out.println("F(" + posicion[0] + ", " + posicion[1] + ")");
-        }*/
-
         if (this.camino.size() == 0) {
             System.out.println("Vacio");
         } else {
@@ -95,7 +91,6 @@ public class Robot {
                 System.out.println("F(" + posicion[0] + ", " + posicion[1] + ")");
             }
         }
-
     }
 
     private void imprimirEdificio() {
@@ -108,10 +103,7 @@ public class Robot {
     }
 
     public static char[][] generarEdificioAleatorio(int filas, int columnas) {
-        // Crear una instancia de Random para generar valores aleatorios
         Random random = new Random();
-
-        // Definir los caracteres posibles en el edificio (L, E, T)
         char[] caracteresPosibles = {'L', 'E', 'T'};
         char[][] edificio = new char[filas][columnas];
 
@@ -122,7 +114,6 @@ public class Robot {
             }
         }
 
-        // Colocar el tornillo en una posición aleatoria
         int filaTornillo = random.nextInt(filas);
         int columnaTornillo = random.nextInt(columnas);
         edificio[filaTornillo][columnaTornillo] = 'T';
@@ -131,10 +122,8 @@ public class Robot {
     }
 
     private static char[][] leerEdificioDesdeArchivo(String fileName) {
-        // Patrón que verifica si el nombre del archivo tiene una extensión .txt
         Pattern pattern = Pattern.compile("^.+\\.txt$");
         Matcher matcher = pattern.matcher(fileName);
-
 
         if (!matcher.matches()) {
             System.err.println("El nombre del archivo debe tener la extensión .txt");
@@ -160,43 +149,16 @@ public class Robot {
     }
 
     public void escribirTrazaEnArchivo(String nombreArchivo) {
-
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(nombreArchivo))) {
-            // Se escribe la cantidad mínima en la primera línea.
-
             bw.write(String.format(nombreArchivo));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
-            // Escribir información del edificio original
-            writer.write(nombreArchivo);
-            escribirEdificioEnArchivo(writer, edificio);
-
-            // Ejecutar el algoritmo para encontrar el tornillo y escribir la traza
-            encontrarTornilloDesdePosicion(posicionActual[0], posicionActual[1]);
-
-            // Escribir resultado del algoritmo
-            writer.write("\nResultado del algoritmo:\n");
-            escribirEdificioEnArchivo(writer, edificio);
-
-            // Escribir camino desde el tornillo hasta la salida
-            writer.write("Camino desde el tornillo hasta la salida:\n");
-            for (int[] posicion : camino) {
-                writer.write("F(" + posicion[0] + ", " + posicion[1] + ")\n");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
 
-    // Método para almacenar el resultado en un archivo de salida
-    public void guardarResultadoEnArchivo(Robot robot, String nombreArchivoSalida, char[][] edificio) {
+
+    public void guardarResultadoEnArchivo(RobotSolver robot,String nombreArchivoSalida, char[][] edificio) {
         try {
             File archivo = new File(nombreArchivoSalida);
 
@@ -229,6 +191,11 @@ public class Robot {
         }
     }
 
+
+
+
+
+
     private void imprimirEdificioEnArchivo(BufferedWriter writer, char[][] edificio) throws IOException {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -238,8 +205,6 @@ public class Robot {
         }
     }
 
-
-
     private void escribirEdificioEnArchivo(BufferedWriter writer, char[][] edificio) throws IOException {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -248,7 +213,6 @@ public class Robot {
             writer.write("\n");
         }
     }
-
 
     public static void main(String[] args) {
         char[][] edificioInicial = {
@@ -264,45 +228,41 @@ public class Robot {
         Pattern pattern = Pattern.compile(regexTxt);
         String archivoEntrada = null;
         String archivoSalida = null;
-        Robot robot1 = null; //Creacion del robot
-
-        for(int i=0; i<args.length; i++){
+        RobotSolver robot1 = null;//Creacion del robot
+        for (int i = 0; i < args.length; i++) {
             Matcher matcher = pattern.matcher(args[i]);
 
-            if(args[i].equals("-t")){
+            if (args[i].equals("-t")) {
                 trazar = true;
             }
 
-            if(args[i].equals("-h")){
+            if (args[i].equals("-h")) {
                 ayuda();
                 return;
             }
 
-            if(matcher.matches()){
-                if(archivoEntrada == null){
+            if (matcher.matches()) {
+                if (archivoEntrada == null) {
                     archivoEntrada = args[i];
                     char[][] edificioEntrada = leerEdificioDesdeArchivo(archivoEntrada);
-                    robot1 = new Robot(edificioEntrada);
+                    robot1 = new RobotSolver(edificioEntrada);
                     robot1.imprimirEdificio();
-                    imprimirPantalla(robot1, edificioEntrada,trazar);
-                }else if(archivoSalida == null){
+                    imprimirPantalla(robot1,edificioEntrada, trazar);
+                } else if (archivoSalida == null) {
                     archivoSalida = args[i];
-                    robot1.guardarResultadoEnArchivo(robot1, archivoSalida, edificio);
-
-                    System.out.println("Traza guardada en  "+ archivoSalida);
+                    robot1.guardarResultadoEnArchivo(robot1,archivoSalida, edificio);
+                    System.out.println("Traza guardada en  " + archivoSalida);
                 }
             }
-
         }
-
-
     }
 
-    public static void imprimirPantalla(Robot robot, char[][] edificio, boolean traza){
+    public static void imprimirPantalla(RobotSolver robot,char[][] edificio, boolean traza) {
+
         List<int[]> camino = robot.encontrarTornillo();
-        if(!traza){
-            //no se imprime
-        }else{
+        if (!traza) {
+            // No se imprime
+        } else {
             robot.trazarAlgoritmo(edificio);
         }
     }
