@@ -89,7 +89,7 @@ public class Robot {
         }*/
 
         if (this.camino.size() == 0) {
-            System.out.println("Vacio");
+            System.out.println("No se encontró un camino hasta el tornillo.");
         } else {
             for (int[] posicion : getCamino()) {
                 System.out.println("F(" + posicion[0] + ", " + posicion[1] + ")");
@@ -168,30 +168,6 @@ public class Robot {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        /*
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
-            // Escribir información del edificio original
-            writer.write(nombreArchivo);
-            escribirEdificioEnArchivo(writer, edificio);
-
-            // Ejecutar el algoritmo para encontrar el tornillo y escribir la traza
-            encontrarTornilloDesdePosicion(posicionActual[0], posicionActual[1]);
-
-            // Escribir resultado del algoritmo
-            writer.write("\nResultado del algoritmo:\n");
-            escribirEdificioEnArchivo(writer, edificio);
-
-            // Escribir camino desde el tornillo hasta la salida
-            writer.write("Camino desde el tornillo hasta la salida:\n");
-            for (int[] posicion : camino) {
-                writer.write("F(" + posicion[0] + ", " + posicion[1] + ")\n");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
     }
 
 
@@ -251,6 +227,7 @@ public class Robot {
 
 
     public static void main(String[] args) {
+        //generarEdificioAleatorio(filas, columnas);
         char[][] edificioInicial = {
                 {'L', 'L', 'E', 'L', 'L'},
                 {'L', 'E', 'L', 'E', 'L'},
@@ -268,6 +245,7 @@ public class Robot {
 
         for(int i=0; i<args.length; i++){
             Matcher matcher = pattern.matcher(args[i]);
+
 
             if(args[i].equals("-t")){
                 trazar = true;
@@ -291,11 +269,16 @@ public class Robot {
 
                     System.out.println("Traza guardada en  "+ archivoSalida);
                 }
+            //Si se activa -t y no hay entrada.txt inicializa un edificio aleatorio
+            }if(!matcher.matches()){
+                char[][] edificioAleatorio;
+                System.out.println("No hay edificio de entrada.");
+                edificioAleatorio = generarEdificioAleatorio(6, 5);
+                Robot robotAleatorio = new Robot(edificioAleatorio);
+                robotAleatorio.imprimirEdificio();
+                imprimirPantalla(robotAleatorio, edificioAleatorio,trazar);
             }
-
         }
-
-
     }
 
     public static void imprimirPantalla(Robot robot, char[][] edificio, boolean traza){
